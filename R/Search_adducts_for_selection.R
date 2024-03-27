@@ -1,7 +1,25 @@
-### Look for a certain selection of unique markers in your data 
+### udims script
+#in: outlists | unique-markers
+#out: excel workbook | pdf with plots 
+
+# load libraries 
+library('ggplot2')
+#library('gridExtra')
+library('openxlsx')
+
+# config: 
+path <- 'data/raw/' #change this manually 
+runname <- 'testrun' 
+
+# load required objects & functions 
+Unique_markers_urine <- read.xlsx(paste0(path,'Unique_markers_urine_copy.xlsx')) #load dataframe 
+load('~/R/AddOnFunctions/load_outlists.R') #load add on function 
+RES_RUN <- read.xlsx(paste0(path,'/udims/data/raw/RES_UR_RUN5_20240313_noTIC2.xlsx')) #load dataset-in
+
+# Look for a certain selection of unique markers in your data 
 ORGZ_sel <- c('Lactaat','3-OH boterzuur','3-OH-propionzuur','3-OH isovaleriaanzuur','Methylmalonzuur','Glutaarzuur','malaat','3-OH-adipinezuur','Homovanillinezuur','vanillylamandelzuur ','5-oxo-proline')
 
-# need to have run the first lines of unique_markers.R first (load UMU, and RES_RUN)
+# Retrieve selection (=ORGZ_sel) from Unique_markers_urine 
 ORGZ_SEL <- data.frame()
 for (i in ORGZ_sel){
   df <- Unique_markers_urine[Unique_markers_urine$Biomarker == i,]
@@ -17,7 +35,7 @@ for (i in 1:nrow(ORGZ_SEL)) {
   pattern <- paste0(hmdb_codes, collapse = "|")
   # last check for whitespaces 
   pattern <- gsub('\\s',"",pattern)
-  hmdb_names <- RES_RUN4$HMDB_name[grep(pattern, RES_RUN4$HMDB_code)]
+  hmdb_names <- RES_RUN$HMDB_name[grep(pattern, RES_RUN$HMDB_code)]
   hmdb_names <- paste(hmdb_names, collapse = '|')
   #hmdb_names <- hmdb_names[hmdb_names != ""]
   ORGZ_SEL$HMDB_name[i] <- hmdb_names
@@ -25,9 +43,9 @@ for (i in 1:nrow(ORGZ_SEL)) {
 
 # check some individually:
 name <- 'Homovanillic acid'
-RES_RUN4[grep(name,RES_RUN4$HMDB_name),c('HMDB_code','HMDB_name')]
+RES_RUN[grep(name,RES_RUN$HMDB_name),c('HMDB_code','HMDB_name')]
 HMDB_code <- 'HMDB62492'
-RES_RUN4[grep(HMDB_code,RES_RUN4$HMDB_code),c('HMDB_code','HMDB_name')]
+RES_RUN[grep(HMDB_code,RES_RUN$HMDB_code),c('HMDB_code','HMDB_name')]
 
 HMDB_code <- 'HMDB00243'
 HMDB_name <- 'Lactic acid'
@@ -37,7 +55,7 @@ NH4_sel <- isotope_matches_data_pos_all[isotope_matches_data_pos_all$adduct.nr =
 isotopes_db
 
 # make a subdf of the data for ORGZ_SEL & add the pattern and the name! 
-rundata <- RES_RUN5
+rundata <- RES_RUN
 RUN_ORGZ <- data.frame()
 for (i in 1:nrow(ORGZ_SEL)){
   hmdb_codes <- strsplit(ORGZ_SEL$HMDB_code_5[i], "\r\n")
@@ -73,16 +91,16 @@ for (i in 1:nrow(ORGZ_SEL)){
 
 #Save both in an excel workbook:
 
-# Create workbook
-library(openxlsx)      
-ORGZ_RUN4 <- createWorkbook()
-
-addWorksheet(ORGZ_RUN4, sheetName = "RUN4_ORGZ")
-writeData(ORGZ_RUN4, sheet = "RUN4_ORGZ", x = RUN4_ORGZ,startRow = 1, startCol = 1, rowNames = TRUE)
-addWorksheet(ORGZ_RUN4, sheetName = "RUN4_ORGZ_adducts")
-writeData(ORGZ_RUN4, sheet = "RUN4_ORGZ_adducts", x = RUN4_ORGZ_adducts, startRow = 1, startCol = 1, rowNames = TRUE)
-
-saveWorkbook(ORGZ_RUN4, file = paste0(path, 'ORGZ_selection_RUN4.xlsx'))
+# Create workbook for the sums (adjusted version below >> delete )
+# library(openxlsx)      
+# ORGZ_RUN4 <- createWorkbook()
+# 
+# addWorksheet(ORGZ_RUN4, sheetName = "RUN4_ORGZ")
+# writeData(ORGZ_RUN4, sheet = "RUN4_ORGZ", x = RUN4_ORGZ,startRow = 1, startCol = 1, rowNames = TRUE)
+# addWorksheet(ORGZ_RUN4, sheetName = "RUN4_ORGZ_adducts")
+# writeData(ORGZ_RUN4, sheet = "RUN4_ORGZ_adducts", x = RUN4_ORGZ_adducts, startRow = 1, startCol = 1, rowNames = TRUE)
+# 
+# saveWorkbook(ORGZ_RUN4, file = paste0(path, 'ORGZ_selection_RUN4.xlsx'))
 
 # -------- # ----------- # ------------------ 
 ### Do the same as above, now add for the adducts the search-hmdb and the corresponding name to make finding easier 
@@ -102,7 +120,7 @@ dataset_in <- outlist.ident.pos #outlist.not.ident.[pos|neg] not connected to hm
 #   pattern <- gsub('\\s',"",pattern)
 #   matching_rows <- dataset_in[grep(pattern,dataset_in$HMDB_code),] #change 2x dataset_in
 #   matching_rows$pattern <- pattern
-#   hmdb_names <- RES_RUN4$HMDB_name[grep(pattern, RES_RUN4$HMDB_code)]
+#   hmdb_names <- RES_RUN$HMDB_name[grep(pattern, RES_RUN$HMDB_code)]
 #   hmdb_names <- paste(hmdb_names, collapse = '|')
 #   matching_rows$hmdb_names <- hmdb_names
 #   RUN4_ORGZ_adducts <- rbind(RUN4_ORGZ_adducts,matching_rows) #change 2x dataset_out 
@@ -234,9 +252,6 @@ saveWorkbook(ORGZ_RUN, file = paste0(path, '/',run_name,'ORGZ_selection_RUN.xlsx
 # Save the extended version 
 # --------- create plots 
 
-library(ggplot2)
-library(gridExtra)
-
 # INPUT FOR CODE BELOW 
 df <- RUN_ORGZ_adducts_pos
 mode_adducts <- pos_adducts 
@@ -314,6 +329,7 @@ for (page in seq_len(ceiling(num_plots / plots_per_page))) {
 # Close the PDF device
 dev.off()
 
+#no idea anymore if i used this part of the one above, sorry
 # adjust parameters for loop above 
 num_plots <- length(plots)
 num_cols <- 2  # Fixed number of columns
@@ -322,12 +338,24 @@ plots_per_page <- num_cols * num_rows
 
 # ---- 
 # Print each plot to the single PDF file
-for (k in 1:length(plots)) {
-  # print(plots[[k]])
-}
+# for (k in 1:length(plots)) {
+#   # print(plots[[k]])
+# }
 
 # Close the PDF device
 dev.off()
 
 
-
+# from the workshop 
+install.packages("styler")
+install.packages("lintr")
+library("styler")
+lint('Search_adducts_for_selection.R')
+styler('Search_adducts_for_selection.R')
+install.packages('renv')
+renv::init()
+renv::activate()
+renv::status()
+renv::snapshot()
+Y
+getwd()
