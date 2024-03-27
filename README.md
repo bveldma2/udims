@@ -1,3 +1,39 @@
+# udims 
+
+## Project description 
+This script is used in untargeted metabolomics analysis in urine using Direct-Infusion Massa Spec (DIMS). DIMS output consists of two outlists, one for negative scanning mode, and one for positive scanning mode. The outlists have been annotated with the use of HDMB database (ppm < 5). Utargeted metabolomics returns large datasets, this code is used to look at a subselection (ORGZ_sel), with names derived from the remote Unique_markers_urine dataframe. In the outlists, no sum has yet been made for all adducts for one compound. Adduct types are indicated in the outlist in the column 'assi_HMDB'.
+
+## configuration
+
+input: 
+data/raw/outlists_identified_negative.Rdata
+data/raw/outlists_identified_positive.Rdata 
+data/raw/Unique_markers_urine.RDS 
+
+output: 
+pdf file with plots for your selection
+excel workbook for your selection 
+
+## workflow 
+
+Open the main script: 
+R/Search_adducts_for_selection.R 
+
+specify path & runname; change ORGZ_sel if preferred 
+
+Load AddOnFunctions: [TempPackage]
+R/AddOnFunctions/load_outlists.R 
+
+Load unique-markers: 
+R/AddOnFunctions/unique-markers.RDS 
+
+
+
+
+
+
+# -----
+# OLD TEMPLATE 
 # udims
 
 This project template is a demonstration for the RepCo workshop.
