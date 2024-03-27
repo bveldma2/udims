@@ -4,15 +4,24 @@
 This script is used in untargeted metabolomics analysis in urine using Direct-Infusion Massa Spec (DIMS). DIMS output consists of two outlists, one for negative scanning mode, and one for positive scanning mode. The outlists have been annotated with the use of HDMB database (ppm < 5). Utargeted metabolomics returns large datasets, this code is used to look at a subselection (ORGZ_sel), with names derived from the remote Unique_markers_urine dataframe. In the outlists, no sum has yet been made for all adducts for one compound. Adduct types are indicated in the outlist in the column 'assi_HMDB'.
 
 ## configuration
+This project uses Rstudio to run scripts.
+
+specify path & runname; change ORGZ_sel if preferred 
 
 input: 
-data/raw/outlists_identified_negative.Rdata
-data/raw/outlists_identified_positive.Rdata 
+data/raw/runname/outlists_identified_negative.Rdata
+data/raw/runname/outlists_identified_positive.Rdata 
 data/raw/Unique_markers_urine.RDS 
 
 output: 
-pdf file with plots for your selection
-excel workbook for your selection 
+data/processed/runname/ORGZ_plots_RUN5_pos.pdf   #pdf file with plots for your selection
+data/processed/runname/ORGZ_selection_RUN.xlsx   #excel workbook for your selection 
+
+## dependencies 
+
+Required packages: 
+ggplot2
+openxlsx
 
 ## workflow 
 
